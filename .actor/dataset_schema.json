@@ -1,0 +1,23 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "type": "object",
+        "properties": {
+            "name": { "title": "Name", "type": "string", "description": "Business name" },
+            "phone": { "title": "Phone", "type": "string", "description": "Phone number" },
+            "email": { "title": "Email", "type": "string", "description": "Email address" },
+            "address": { "title": "Address", "type": "string", "description": "Full address" },
+            "website": { "title": "Website", "type": "string", "description": "Website URL" },
+            "category": { "title": "Category", "type": "string", "description": "Business category" },
+            "sourceUrl": { "title": "Source URL", "type": "string", "description": "URL where data was found" }
+        },
+        "additionalProperties": true
+    },
+    "views": {
+        "overview": {
+            "title": "Overview",
+            "transformation": { "fields": ["name", "phone", "email", "address", "website", "category"] },
+            "display": { "component": "table" }
+        }
+    }
+}

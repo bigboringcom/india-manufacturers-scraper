@@ -1,0 +1,15 @@
+{
+  "name": "india-manufacturers-scraper",
+  "version": "1.0.0",
+  "description": "Extracts Indian manufacturers, suppliers and B2B businesses with phone, email, address and product details from Sansadhan business directory.",
+  "main": "src/main.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/main.js"
+  },
+  "dependencies": {
+    "apify": "^3.2.0",
+    "cheerio": "^1.0.0-rc.12",
+    "crawlee": "^3.9.0"
+  }
+}
