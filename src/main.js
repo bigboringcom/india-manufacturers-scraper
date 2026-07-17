@@ -21,7 +21,7 @@ const START_URLS = [
 ];
 
 // Noise words to filter out (UI elements, not real listings)
-const NOISE = ['show filters', 'login', 'register', 'list your business', 'see all', 'search', 'browse', 'select a category', 'home', 'about us', 'contact us', 'privacy policy'];
+const NOISE = ['show filters', 'login', 'register', 'list your business', 'see all', 'search', 'browse', 'select a category', 'home', 'about us', 'contact us', 'privacy policy', 'speak now', 'sansadhan', 'join now', 'grab special', 'click here', 'try us', 'pay bills', 'customer support', 'disclaimer', 'free listing', 'advertising'];
 
 let totalItems = 0;
 
@@ -59,11 +59,11 @@ const crawler = new CheerioCrawler({
                 return false;
             });
 
-            // Website (external link) - exclude sansadhan.com, facebook, google, twitter
+            // Website (external link) - exclude sansadhan.com, facebook, google, twitter, whatsapp
             let website = '';
             $('a[href^="http"]').each((_, el) => {
                 const href = $(el).attr('href') || '';
-                if (!href.includes('sansadhan.com') && !href.includes('facebook.com') && !href.includes('google.com') && !href.includes('twitter.com')) {
+                if (!href.includes('sansadhan.com') && !href.includes('facebook.com') && !href.includes('google.com') && !href.includes('twitter.com') && !href.includes('wa.me') && !href.includes('instagram.com') && !href.includes('linkedin.com') && !href.includes('youtube.com') && !href.includes('yuvaninfomedia.com')) {
                     website = href;
                     return false;
                 }
