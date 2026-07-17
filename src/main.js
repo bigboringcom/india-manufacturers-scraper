@@ -31,14 +31,20 @@ const crawler = new CheerioCrawler({
     async requestHandler({ $, request, enqueueLinks }) {
         if (totalItems >= maxItems) return;
 
-        const isDetailPage = request.userData.type === 'detail';
+        const isDetailPage = request.userData.type === 'detail' || request.url.includes('/yp/');
 
         if (isDetailPage) {
             // DETAIL PAGE: extract full contact info
             log.info(`Detail: ${request.url}`);
 
-            const name = $('h1, h2').first().text().trim() || request.userData.name || '';
-            if (!name || name.length < 3) return;
+            let name = $('h1, h2').first().text().trim() || request.userData.name || '';
+            if (!name || name.length < 3) {
+                name = $('title').text().replace(/\s*[-|].*$/, '').trim();
+            }
+            if (!name || name.length < 3) {
+                log.debug(`Skipping detail page with no name: ${request.url}`);
+                return;
+            }
 
             // Phone - Indian format
             let phone = '';
