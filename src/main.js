@@ -37,7 +37,24 @@ const crawler = new CheerioCrawler({
             // DETAIL PAGE: extract full contact info
             log.info(`Detail: ${request.url}`);
 
-            let name = $('h1, h2').first().text().trim() || request.userData.name || '';
+            // Name: sansadhan.com puts the business name in a bold/heading at the top
+            // but also has "Speak Now" CTA in h-tags. Filter those out.
+            let name = '';
+            $('h1, h2, h3, strong, b').each((_, el) => {
+                const text = $(el).text().trim();
+                if (text.length >= 4 && text.length <= 100
+                    && !text.toLowerCase().includes('speak now')
+                    && !text.toLowerCase().includes('sansadhan')
+                    && !text.toLowerCase().includes('popular search')
+                    && !text.toLowerCase().includes('get in touch')
+                    && !text.toLowerCase().includes('our customer')
+                    && !text.toLowerCase().includes('connect :')
+                    && !text.toLowerCase().includes('write a review')) {
+                    name = text;
+                    return false;
+                }
+            });
+            if (!name) name = request.userData.name || '';
             if (!name || name.length < 3) {
                 name = $('title').text().replace(/\s*[-|].*$/, '').trim();
             }
@@ -46,15 +63,15 @@ const crawler = new CheerioCrawler({
                 return;
             }
 
-            // Phone - Indian format
+            // Phone - use tel: links, validate 8+ digits
             let phone = '';
             $('a[href^="tel:"]').each((_, el) => {
-                phone = $(el).text().trim() || $(el).attr('href').replace('tel:', '');
-                return false;
+                const p = ($(el).attr('href') || '').replace('tel:', '').trim();
+                if (p.replace(/\D/g, '').length >= 8) { phone = p; return false; }
             });
             if (!phone) {
                 const bodyText = $('body').text();
-                const phoneMatch = bodyText.match(/(?:\+91|0)\s?\d{2,5}[\s-]?\d{3,7}[\s-]?\d{0,4}/);
+                const phoneMatch = bodyText.match(/[6-9]\d{4}\s?\d{5}/);
                 if (phoneMatch) phone = phoneMatch[0].trim();
             }
 
