@@ -63,15 +63,28 @@ const crawler = new CheerioCrawler({
                 return;
             }
 
-            // Phone - use tel: links, validate 8+ digits
+            // Phone - extract from tel: links, WhatsApp links, or body text
             let phone = '';
+            // Method 1: tel: links
             $('a[href^="tel:"]').each((_, el) => {
                 const p = ($(el).attr('href') || '').replace('tel:', '').trim();
                 if (p.replace(/\D/g, '').length >= 8) { phone = p; return false; }
             });
+            // Method 2: WhatsApp links (wa.me/91XXXXXXXXXX)
+            if (!phone) {
+                $('a[href*="wa.me/"]').each((_, el) => {
+                    const href = $(el).attr('href') || '';
+                    const waMatch = href.match(/wa\.me\/(\d{10,13})/);
+                    if (waMatch) {
+                        phone = waMatch[1].startsWith('91') ? '+' + waMatch[1] : waMatch[1];
+                        return false;
+                    }
+                });
+            }
+            // Method 3: Look for Indian mobile pattern in page text (10 digits starting with 6-9)
             if (!phone) {
                 const bodyText = $('body').text();
-                const phoneMatch = bodyText.match(/[6-9]\d{4}\s?\d{5}/);
+                const phoneMatch = bodyText.match(/(?:\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}/);
                 if (phoneMatch) phone = phoneMatch[0].trim();
             }
 
