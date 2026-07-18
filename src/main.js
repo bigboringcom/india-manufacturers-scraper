@@ -70,12 +70,12 @@ const crawler = new CheerioCrawler({
                 const p = ($(el).attr('href') || '').replace('tel:', '').trim();
                 if (p.replace(/\D/g, '').length >= 8) { phone = p; return false; }
             });
-            // Method 2: WhatsApp links (wa.me/91XXXXXXXXXX)
+            // Method 2: WhatsApp links (wa.me/91XXXXXXXXXX) — exclude sansadhan's own number
             if (!phone) {
                 $('a[href*="wa.me/"]').each((_, el) => {
                     const href = $(el).attr('href') || '';
                     const waMatch = href.match(/wa\.me\/(\d{10,13})/);
-                    if (waMatch) {
+                    if (waMatch && !waMatch[1].includes('9313555700')) {
                         phone = waMatch[1].startsWith('91') ? '+' + waMatch[1] : waMatch[1];
                         return false;
                     }
@@ -84,8 +84,14 @@ const crawler = new CheerioCrawler({
             // Method 3: Look for Indian mobile pattern in page text (10 digits starting with 6-9)
             if (!phone) {
                 const bodyText = $('body').text();
-                const phoneMatch = bodyText.match(/(?:\+91[\s-]?)?[6-9]\d{4}[\s-]?\d{5}/);
-                if (phoneMatch) phone = phoneMatch[0].trim();
+                const allMatches = bodyText.matchAll(/(?:\+91[\s-]?)?([6-9]\d{4}[\s-]?\d{5})/g);
+                for (const m of allMatches) {
+                    const candidate = m[1].replace(/[\s-]/g, '');
+                    if (candidate !== '9313555700' && candidate.length === 10) {
+                        phone = m[0].trim();
+                        break;
+                    }
+                }
             }
 
             // Email
